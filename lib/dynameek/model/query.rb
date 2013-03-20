@@ -17,9 +17,13 @@ module Dynameek
         end
       
         def where(value, op=:eq)
-          raise Exception("Op #{op.to_s} not recognised") if(!@range.keys.include?(op))
+          raise Exception.new("Op #{op.to_s} not recognised") if(!@range.keys.include?(op))
           @range[op] = value
           self
+        end
+      
+        def delete
+          each(&:delete)
         end
       
         def all
@@ -27,11 +31,15 @@ module Dynameek
         end
       
         def each
-          all.each
+          all.each do |item|
+            yield(item)
+          end
         end
       
         def each_with_index
-          all.each_with_index
+          all.each_with_index do |item, index|
+            yield(item, index)
+          end
         end
       
         RANGE_QUERY_MAP =
@@ -51,22 +59,29 @@ module Dynameek
           hash_key = @hash_key
           hash_key = hash_key.join(@model.multi_column_join) if(hash_key.is_a?(Array))
         
-          query_hash = {:hash_value => hash_key}
+          query_hash = {:hash_value => hash_key, :select => :all}
         
           query_hash = @range.reduce(query_hash) do |hsh, (key, val)|
             if(!val.nil?)
-              hsh[RANGE_QUERY_MAP[key]] = @model.convert_to_dynamodb(@model.range_field.type, val)
+              hsh[RANGE_QUERY_MAP[key]] = @model.convert_to_dynamodb(@model.range_info.type, val)
             end
             hsh
           end
-          @model.table.items.query(query_hash).map{|item| @model.item_to_instance(item)}
+          # p query_hash
+          # "CONTENTS"
+          # @model.table.items.each{|item| p item.inspect}
+          # p "_________"
+          @model.table.items.query(query_hash).map{|item| 
+            # p item.inspect
+            @model.item_to_instance(item)
+          }
         
         end
       
     
       end
     
-      [:query, :where, :all, :each, :each_with_index].each do |method|
+      [:query, :where, :all, :each, :each_with_index, :delete].each do |method|
         define_method(method) do |*args|
           qc = QueryChain.new(self)
           args = [] if !args
