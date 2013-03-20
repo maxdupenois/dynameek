@@ -34,7 +34,10 @@ These models can be queried by find and query, although this is still undergoing
     
     Conversion.find([1, "google"], DateTime.new([Some existing datetime]))
     
-    Conversion.query(["1", "google"]).where(DateTime.now, :lt).where(DateTime.now - 10, :gt).all
+    Conversion.query(["1", "google"]).where(DateTime.now, :lt).where(DateTime.now - 10, :gte).all
+  
+  NB. The where clauses are only for referencing the range part of the composite hash key, there is currently no way to search by
+  hash contents as that felt like it was against the point of a document store. 
   
 ### Disclaimery Bit
 
