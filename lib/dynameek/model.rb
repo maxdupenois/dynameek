@@ -1,7 +1,7 @@
 class Dynameek::Model
-  extend Dynameek::DynamoDb
-  extend Dynameek::ModelStructure
-  extend Dynameek::Query
+  extend Dynameek::Model::DynamoDb
+  extend Dynameek::Model::Structure
+  extend Dynameek::Model::Query
   
   
   
@@ -11,7 +11,7 @@ class Dynameek::Model
   
   
   def self.find(hash_key, range_val=nil)
-    raise Exception("This has a composite hash with a range, the range val is required") if(range_val.nil? && !@@range.field.nil?)
+    raise Exception("This has a composite hash with a range, the range val is required") if(range_val.nil? && !range_field.field.nil?)
     #multicolumn
     hash_key = hash_key.join(multi_column_join) if(hash_key.is_a?(Array))
 
@@ -49,9 +49,12 @@ class Dynameek::Model
     instance.save
   end
   
-  @@before_save_callbacks = Set.new
+  def self.before_save_callbacks
+    @before_save_callbacks ||= Set.new
+  end
+  
   def self.before_save method
-    @@before_save_callbacks.add(method.to_sym)  
+    before_save_callbacks << method.to_sym
   end
   
   def save
@@ -63,7 +66,7 @@ class Dynameek::Model
       memo[field] = val
       memo
     end
-    @@before_save_callbacks.each{|method| self.send method}
+    self.class.before_save_callbacks.each{|method| self.send method}
     self.class.table.batch_write(
       :put => [
         attribs
