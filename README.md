@@ -4,7 +4,9 @@ A very lightweight ORMish model thing for amazon's dynamo db, after initialising
     amazon_config_path = File.join(File.dirname(__FILE__), *%w[.. config amazon.config.yml])
     amazon_config = YAML.load(File.read(amazon_config_path))
     AWS.config(amazon_config[ENVIRONMENT])
-    
+
+##Models
+   
 You can create table models with this kind of syntax:
 
     class Conversion < Dynameek::Model
@@ -17,9 +19,24 @@ You can create table models with this kind of syntax:
       multi_column_hash_key [:client_id, :channel_id]
       range :time
 
-
     end
 
-These models can be queried by find and range_query, although this is still undergoing some refactoring at the moment
-so i'm not going to show how you do that yet (it's kinda ugly). Feel free to look in the code, I'd imagine it's going to change
-a lot. I short don't use this unless you're me, use dynamoid or the sdk by itself.
+Creation of the models is as you'd expect
+    
+    con = Conversion.create(:client_id => 1, :channel_id => "google", :goal_name=> "Some Goal", :time => DateTime.now)
+
+The models can be edited like normal (_no update\_attributes yet though_)
+
+    con.goal_name="hello"
+    con.save
+    
+These models can be queried by find and query, although this is still undergoing some refactoring at the moment it currently looks something like this:
+    
+    Conversion.find([1, "google"], DateTime.new([Some existing datetime]))
+    
+    Conversion.query(["1", "google"]).where(DateTime.now, :lt).where(DateTime.now - 10, :gt).all
+  
+### Disclaimery Bit
+
+Delete is not currently supported because I don't need it, and while there's a gemspec the gem hasn't been built yet because everything
+is still subject to heavy change.
