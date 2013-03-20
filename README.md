@@ -38,5 +38,5 @@ These models can be queried by find and query, although this is still undergoing
   
 ### Disclaimery Bit
 
-Delete is not currently supported because I don't need it, and while there's a gemspec the gem hasn't been built yet because everything
-is still subject to heavy change.
+Delete is not currently supported because I don't need it. The gem is dynameek (unsurprisingly) but I wouldn't use it yet, far better
+to clone down the project and modify it for your own use.
