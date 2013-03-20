@@ -7,7 +7,7 @@ A very lightweight ORMish model thing for amazon's dynamo db, after initialising
     
 You can create table models with this kind of syntax:
 
-    class Conversion < DynamodbModel
+    class Conversion < Dynameek::Model
 
       field :client_id, :integer
       field :channel_id, :string
