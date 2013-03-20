@@ -2,7 +2,6 @@ module Dynameek
   module Model
     module Structure
       
-
       def fields
         @fields ||= {}
       end
@@ -46,9 +45,7 @@ module Dynameek
       def multi_column_hash_key_fields
         @multi_column_hash_key_fields ||= []
       end
-      
-  
-      
+            
       def multi_column_join
         @multi_column_join ||= "|"
       end
@@ -70,8 +67,6 @@ module Dynameek
         define_method("#{fieldname.to_s}=") {|value| write_attribute(fieldname, value) }
       end 
 
-
-
       def hash_key fieldname
         fieldname = fieldname.to_sym
         check_field(fieldname)
@@ -79,10 +74,6 @@ module Dynameek
         hash_key_info.type = fields[fieldname]
         define_method(:hash_key) { read_attribute(fieldname) }
       end
-
-      
-    
-    
     
       def multi_column_hash_key fieldnames
         fieldnames = fieldnames.map(&:to_sym)
@@ -100,8 +91,6 @@ module Dynameek
         hash_key_info.field = fieldname
         hash_key_info.type = :string
       end
-    
-
 
       def range fieldname
         fieldname = fieldname.to_sym
@@ -109,11 +98,6 @@ module Dynameek
         range_info.field = fieldname
         range_info.type = fields[fieldname]
       end
-
-    
-    
-  
-      
 
       def check_field(fieldname)
         raise ("#{fieldname} is not a recognised field") if fields[fieldname].nil?

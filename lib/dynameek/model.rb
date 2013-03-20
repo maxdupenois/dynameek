@@ -22,8 +22,6 @@ module Dynameek
       self
     end
     
-    
-    
     def attributes
       @attributes ||= {}
     end
@@ -62,31 +60,24 @@ module Dynameek
       include Dynameek::Model::DynamoDb
       include Dynameek::Model::Structure
       include Dynameek::Model::Query
-      
-  
-  
   
       def find(hash_key, range_val=nil)
         raise Exception("This has a composite hash with a range, the range val is required") if(range_val.nil? && range?)
         #multicolumn
         hash_key = hash_key.join(multi_column_join) if(hash_key.is_a?(Array))
-
         items = if range?
           range_val = convert_to_dynamodb(range_info.type, range_val)
           table.batch_get(:all, [[hash_key, range_val]])
         else  
           table.batch_get(:all, [hash_key])
         end
-        # p items.methods - Object.new.methods
         return nil if(items.entries.size == 0)
         item_to_instance(items.first)
-    
       end
   
       def delete_table
         table.delete
       end
-
   
       def item_to_instance(item)
         item_hsh = (item.is_a?(AWS::DynamoDB::Item) || item.is_a?(AWS::DynamoDB::ItemData) ? item.attributes.to_hash : item)
@@ -100,8 +91,6 @@ module Dynameek
         end
         instance
       end
-  
-      
   
       def create(attrib)
         instance = self.new
@@ -119,13 +108,9 @@ module Dynameek
         before_save_callbacks << method.to_sym
       end
   
-
-  
       def table_name
         self.to_s
       end
-  
-
   
     end
   end

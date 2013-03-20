@@ -50,8 +50,8 @@ describe Conversion do
     cons.size.should == 3
     cons = Conversion.query([1, "google"]).where(now - 4, :gt).all
     cons.size.should == 3
-    # cons = Conversion.query([1, "google"]).where(now - 2, :gte).where(now, :lt).all
-    #    cons.size.should == 2 Not supported on fake_dynamo, seems to work fine on prod
+    cons = Conversion.query([1, "google"]).where(now - 2, :gte).where(now, :lt).all
+    cons.size.should == 2
   end
   
   
