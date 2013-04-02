@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dynameek (0.2.1)
+    dynameek (0.2.2)
       aws-sdk
 
 GEM
@@ -22,7 +22,7 @@ GEM
     i18n (0.6.1)
     json (1.7.7)
     multi_json (1.7.1)
-    nokogiri (1.5.8)
+    nokogiri (1.5.9)
     rack (1.5.2)
     rack-protection (1.5.0)
       rack

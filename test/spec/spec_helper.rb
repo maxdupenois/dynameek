@@ -10,4 +10,5 @@ AWS.config(:use_ssl => false,
            :secret_access_key => "xxx")
 
 require File.join(File.dirname(__FILE__), *%w[.. models conversion])
+require File.join(File.dirname(__FILE__), *%w[.. models with_index_table])
 require File.join(File.dirname(__FILE__), *%w[.. models simple])

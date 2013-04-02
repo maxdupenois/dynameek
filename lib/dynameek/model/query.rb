@@ -28,7 +28,11 @@ module Dynameek
         def all
           run
         end
-      
+        
+        def size
+          all.size
+        end
+
         def each
           all.each do |item|
             yield(item)
@@ -83,13 +87,45 @@ module Dynameek
             range = range.reduce({}) {|memo, (key, val)| memo[RANGE_QUERY_MAP[key]] = @model.convert_to_dynamodb(@model.range_info.type, val); memo}
           end
           query_hash.merge!(range)
-          @model.table.items.query(query_hash).map{|item| 
-            @model.item_to_instance(item)
-          }
+          if @model.index_table?
+            rows = @model.index_table.items.query(query_hash).map do |item|
+              item_hsh = @model.aws_item_to_hash(item).reduce({}){|m, (k,v)| m[k.to_sym] = v; m}
+              
+              # Need to convert from then back to because of the datetimes being
+              # screwy as number formats
+              hsh_val = @model.convert_from_dynamodb(@model.hash_key_info.type, 
+                                               item_hsh[@model.hash_key_info.field])
+              rng_val = @model.convert_from_dynamodb(@model.range_info.type, 
+                                               item_hsh[@model.range_info.field])
+              hsh_val = @model.convert_to_dynamodb(@model.hash_key_info.type, hsh_val)
+              rng_val = @model.convert_to_dynamodb(@model.range_info.type, rng_val)
+              item_hash_key = [hsh_val, @model.multi_column_join, rng_val].join('')
+              query_hsh_2 = {
+                hash_value: item_hash_key,
+                range_value: (1 .. item_hsh[:current_range_val].to_i),
+                select: :all
+              }
+#              p "QUERYING FOR #{query_hsh_2}"
+#              p "TABLE CONTENTS"
+#              p "--------------"
+#              @model.table.items.each do |i|
+#                p i.inspect
+#              end
+              internal_rows = @model.table.items.query(query_hsh_2).map{|act_item|
+                @model.item_to_instance(act_item)
+              }
+              internal_rows
+            end.flatten
+            rows
+          else
+            @model.table.items.query(query_hash).map{|item| 
+              @model.item_to_instance(item)
+            }
+          end
         end
       end
     
-      [:query, :where, :all, :each, :each_with_index, :delete].each do |method|
+      [:query, :where, :all, :each, :each_with_index, :size, :delete].each do |method|
         define_method(method) do |*args|
           qc = QueryChain.new(self)
           args = [] if !args
