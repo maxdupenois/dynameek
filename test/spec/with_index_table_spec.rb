@@ -48,6 +48,16 @@ describe WithIndexTable do
       {hash_value: "2|google", range_value: time.to_time.to_f, select: :all} 
     )
     res2.first.attributes["current_range_val"].to_i.should == 1
+    WithIndexTable.create(:client_id => 2, :channel_id => "google", 
+                                 :advert_id=> 2, :time => time)
+        
+    WithIndexTable.create(:client_id => 2, :channel_id => "google", 
+                                 :advert_id=> 2, :time => time)
+
+    res3 = WithIndexTable.index_table.items.query(
+      {hash_value: "2|google", range_value: time.to_time.to_f, select: :all} 
+    )
+    res3.first.attributes["current_range_val"].to_i.should == 3
   end
 
   it "should allow you to query for the some hash and range" do
