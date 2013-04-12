@@ -22,6 +22,11 @@ module Dynameek
           when :datetime
             value.to_time.to_f
           when :binary
+            if value.is_a?(Hash) && value.default_proc
+              value = value.clone
+              value.default = nil
+            end
+
             Marshal.dump(value)
           else
             value
