@@ -8,6 +8,7 @@ describe WithIndexTable do
     WithIndexTable.query([1, "google"]).delete
   end
   
+
   it "should allow you to create a new row" do
     con = nil
     lambda{
@@ -28,6 +29,26 @@ describe WithIndexTable do
     row1.hash_key.should == "1|google"
     row2.hash_key.should == "1|google"
   end
+  
+  it "should store the correct dynameek index" do 
+    time = DateTime.now
+    lambda{
+      row1 = WithIndexTable.create(:client_id => 1, :channel_id => "google", 
+                                   :advert_id=> 1, :time => time)
+      row2 = WithIndexTable.create(:client_id => 1, :channel_id => "google", 
+                                   :advert_id=> 2, :time => time)
+      row3 = WithIndexTable.create(:client_id => 2, :channel_id => "google", 
+                                   :advert_id=> 2, :time => time)
+    }.should_not raise_error
+    res = WithIndexTable.index_table.items.query(
+      {hash_value: "1|google", range_value: time.to_time.to_f, select: :all}
+    ) 
+    res.first.attributes["current_range_val"].to_i.should == 2
+    res2 = WithIndexTable.index_table.items.query(
+      {hash_value: "2|google", range_value: time.to_time.to_f, select: :all} 
+    )
+    res2.first.attributes["current_range_val"].to_i.should == 1
+  end
 
   it "should allow you to query for the some hash and range" do
     row1, row2 = nil
@@ -43,5 +64,7 @@ describe WithIndexTable do
     query.size.should == 2
   
   end
+
+
 
 end

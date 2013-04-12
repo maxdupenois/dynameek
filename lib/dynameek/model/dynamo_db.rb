@@ -11,6 +11,8 @@ module Dynameek
             value.to_s
           when :datetime
             Time.at(value).to_datetime
+          when :binary
+            Marshal.load(value)
           else
             value
         end
@@ -19,6 +21,8 @@ module Dynameek
         case type
           when :datetime
             value.to_time.to_f
+          when :binary
+            Marshal.dump(value)
           else
             value
         end
