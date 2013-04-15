@@ -22,17 +22,46 @@ module Dynameek
           when :datetime
             value.to_time.to_f
           when :binary
-            if value.is_a?(Hash) && value.default_proc
-              value = value.clone
-              value.default = nil
-            end
-
+            dump_safe(value)
             Marshal.dump(value)
           else
             value
         end
       end
-      
+      StackFrame = Struct.new(:current, :index)
+
+      def dump_safe(obj)
+        return obj if(!obj.is_a?(Hash) && !obj.is_a?(Array))
+        make_safe = lambda do |thing|
+          if thing.is_a?(Hash)
+            #thing.default_proc = nil
+            thing.default = nil
+          end
+        end
+        stack = []
+        safe = obj
+        stack.push(StackFrame.new(safe, 0))
+        
+        while(current_frame = stack.pop)
+          current = current_frame.current
+          index   = current_frame.index
+          obj     = current.is_a?(Hash) ? current[current.keys[index]] : current[index]
+          make_safe.call(obj) 
+          if index - 1 < current.size
+            # Re-add current enumerable if still elements to check
+            stack.push(StackFrame.new(current, index + 1))
+          end
+          if obj.is_a?(Hash) || obj.is_a?(Array)
+            #If obj is enumerable add to stack
+            stack.push(StackFrame.new(obj, 0))
+          end
+        end
+        safe
+      end
+
+
+
+
       def index_table_exists?
         !index_table.nil? && index_table.exists?
       end
