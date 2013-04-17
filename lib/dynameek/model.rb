@@ -141,7 +141,7 @@ module Dynameek
       end
   
       def table_name
-        self.to_s
+        self.to_s.gsub(/.*?([A-Za-z][A-Za-z0-9]*)$/, '\1')
       end
       
       def index_table_name
