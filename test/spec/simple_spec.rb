@@ -19,6 +19,18 @@ describe Simple do
     con = Simple.find(1)
     con.binary_value[:hello].should == :sup
   end
+
+  it "should ingore nils" do
+    con = nil
+    lambda{
+      con = Simple.create(:my_id => 1, :some_value => "sup", :binary_value => nil)
+    }.should_not raise_error
+    con.hash_key.should == 1
+    con.some_value.should == "sup"
+    con = Simple.find(1)
+    con.binary_value.should be_nil
+  end
+
   it "should allow you to store binary data removing default_proc" do  
     con = nil
     hsh = Hash.new{|h, k|  h[k] = :a}

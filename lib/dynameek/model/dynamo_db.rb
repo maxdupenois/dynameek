@@ -42,6 +42,7 @@ module Dynameek
         end
         stack = []
         safe = obj
+        make_safe.call(safe)
         stack.push(StackFrame.new(safe, 0))
         
         while(current_frame = stack.pop)

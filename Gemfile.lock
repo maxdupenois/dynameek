@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dynameek (0.3.2)
+    dynameek (0.3.7)
       aws-sdk
 
 GEM

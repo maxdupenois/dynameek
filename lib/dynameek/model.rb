@@ -10,7 +10,7 @@ module Dynameek
         #Note that this is required for the multicolumn key
         val =  self.send field
         val = self.class.convert_to_dynamodb(type, val)
-        memo[field] = val
+        memo[field] = val unless val.nil?
         memo
       end
       self.class.before_save_callbacks.each{|method| self.send method}
