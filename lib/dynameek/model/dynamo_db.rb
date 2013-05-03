@@ -2,6 +2,7 @@ module Dynameek
   module Model
     module DynamoDb
       def convert_from_dynamodb(type, value)
+        return nil if value.nil?
         case type
           when :integer
             value.to_i
@@ -18,6 +19,7 @@ module Dynameek
         end
       end
       def convert_to_dynamodb(type, value)
+        return nil if value.nil?
         case type
           when :datetime
             value.to_time.to_f
