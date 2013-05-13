@@ -14,32 +14,41 @@ module Dynameek
         memo
       end
       self.class.before_save_callbacks.each{|method| self.send method}
+      #puts "---------\nDYNAMEEK DEBUG [SAVE]:"
       if self.class.index_table?
         rng = self.class.convert_to_dynamodb(
           self.class.range_info.type, 
           attributes[self.class.range_info.field]
         )
         curr_range = self.class.current_range(hash_key, rng) + 1
+        index_attribs = {
+          self.class.hash_key_info.field.to_s =>attribs[self.class.hash_key_info.field],
+          self.class.range_info.field.to_s => attribs[self.class.range_info.field],
+          "current_range_val"=> curr_range
+        }    
+        #puts "INDEX:"
+        #puts index_attribs 
         self.class.index_table.batch_write(
           :put => [
-            {
-              self.class.hash_key_info.field => attribs[self.class.hash_key_info.field],
-              self.class.range_info.field => attribs[self.class.range_info.field],
-              current_range_val: curr_range
-            }    
+            index_attribs
           ]
         )
+        #puts "-!-"
         attribs[self.class.hash_key_info.field.to_s+"_"+self.class.range_info.field.to_s] = 
            attribs[self.class.hash_key_info.field].to_s +
            self.class.multi_column_join + 
            attribs[self.class.range_info.field].to_s
         attribs[:dynameek_index] = curr_range
+        #puts "DATA:"
+        #puts attribs
         self.class.table.batch_write(
             :put => [
             attribs
           ]
         )
       else
+        #puts "DATA:"
+        #puts attribs
         self.class.table.batch_write(
             :put => [
             attribs

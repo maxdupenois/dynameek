@@ -9,6 +9,18 @@ describe Simple do
     simple.delete if(!simple.nil?)
   end
   
+  it "should allow you to store and retrieve boolean values" do
+    con = nil
+    lambda{
+      con = Simple.create(:my_id => 1, :some_value => "hello", :boolean_value => false)
+    }.should_not raise_error
+    con.hash_key.should == 1
+    con.boolean_value.should == false
+    con = Simple.find(1)
+    con.boolean_value.should == false
+  end
+
+
   it "should allow you to store binary data" do  
     con = nil
     lambda{

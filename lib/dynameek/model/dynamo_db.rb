@@ -12,8 +12,15 @@ module Dynameek
             value.to_s
           when :datetime
             Time.at(value).to_datetime
+          when :boolean
+            value.to_i == 1
           when :binary
-            Marshal.load(value)
+            begin 
+              Marshal.load(value)
+            rescue => e
+              puts "[WARNING] Failed to load value #{value}"
+
+            end
           else
             value
         end
@@ -26,6 +33,8 @@ module Dynameek
           when :binary
             dump_safe(value)
             Marshal.dump(value)
+          when :boolean
+            value ? 1 : 0
           else
             value
         end

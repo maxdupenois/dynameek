@@ -116,6 +116,7 @@ module Dynameek
 
       def current_range(key, range_val)
         return nil if !index_table?
+        index_table.load_schema
         key.join!(multi_column_join) if key.is_a?(Array)
         item = index_table.items.query(
           {
@@ -125,6 +126,7 @@ module Dynameek
           }).first
         return 0 if item.nil?
         item_hsh = aws_item_to_hash(item)    
+        
         item_hsh['current_range_val'].to_i 
       end
   
