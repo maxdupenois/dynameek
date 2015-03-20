@@ -1,3 +1,6 @@
+> _NB_ This code is old, it was written while I was still getting a handle on ruby and it honestly upsets me
+> but I'm a believer in leaving your mistakes in a place you can see them. **Do Not Use**
+
 # Dynameek
 A very lightweight ORMish model thing for amazon's dynamo db, after initialising the aws-sdk with something like:
     
